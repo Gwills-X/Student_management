@@ -69,6 +69,18 @@ class RolesAndPermissionsSeeder extends Seeder
             'subjects.delete',
 
             'class_subjects.manage',
+
+            // Stage 4: Admission Management
+            'admissions.view',
+            'admissions.create',
+            'admissions.edit',
+            'admissions.review',
+            'admissions.assess',
+            'admissions.approve',
+            'admissions.reject',
+            'admissions.withdraw',
+            'admissions.convert',
+            'admissions.manage_documents',
         ];
 
         foreach ($permissions as $permission) {
@@ -137,6 +149,16 @@ class RolesAndPermissionsSeeder extends Seeder
             'subjects.edit',
             'subjects.delete',
             'class_subjects.manage',
+            'admissions.view',
+            'admissions.create',
+            'admissions.edit',
+            'admissions.review',
+            'admissions.assess',
+            'admissions.approve',
+            'admissions.reject',
+            'admissions.withdraw',
+            'admissions.convert',
+            'admissions.manage_documents',
         ]);
 
         // Principal: oversight permissions
@@ -155,9 +177,29 @@ class RolesAndPermissionsSeeder extends Seeder
             'subjects.view',
         ]);
 
-        // Registrar: record & class viewing
-        Role::findByName('Registrar')->syncPermissions([
+        // Principal: supervisory / reporting access only.
+        // Read-only views across modules; NO configuration or management rights.
+        Role::findByName('Principal')->syncPermissions([
             'users.view',
+            'roles.view',
+            'settings.view',
+            'employees.view',
+            'employees.documents',
+            'academic.view',
+            'sessions.view',
+            'terms.view',
+            'stages.view',
+            'class_levels.view',
+            'classes.view',
+            'subjects.view',
+            'admissions.view',
+        ]);
+
+        // Registrar: admissions ownership only. Registrars manage applicants,
+        // applications, documents, assessments and admission decisions.
+        // They do NOT create academic sessions, terms, stages, class levels
+        // or subjects by default.
+        Role::findByName('Registrar')->syncPermissions([
             'employees.view',
             'academic.view',
             'sessions.view',
@@ -165,27 +207,35 @@ class RolesAndPermissionsSeeder extends Seeder
             'stages.view',
             'class_levels.view',
             'classes.view',
-            'classes.create',
-            'classes.edit',
             'subjects.view',
-            'class_subjects.manage',
+            'admissions.view',
+            'admissions.create',
+            'admissions.edit',
+            'admissions.review',
+            'admissions.assess',
+            'admissions.approve',
+            'admissions.reject',
+            'admissions.withdraw',
+            'admissions.convert',
+            'admissions.manage_documents',
         ]);
 
-        // Teacher: view academic classes and subjects
+        // Teacher: read-only access to academic classes and subjects.
+        // Teachers must NOT create or manage academic sessions, terms,
+        // stages, class levels, classes, arms or subjects.
         Role::findByName('Teacher')->syncPermissions([
-            'academic.view',
             'classes.view',
             'subjects.view',
         ]);
 
+        // Form Master: view of their class and subjects — no configuration.
         Role::findByName('Form Master')->syncPermissions([
-            'academic.view',
             'classes.view',
             'subjects.view',
         ]);
 
+        // Assistant Form Master: restricted assistant access — no configuration.
         Role::findByName('Assistant Form Master')->syncPermissions([
-            'academic.view',
             'classes.view',
             'subjects.view',
         ]);
@@ -193,6 +243,8 @@ class RolesAndPermissionsSeeder extends Seeder
         // Student: portal access (future stages)
         Role::findByName('Student')->syncPermissions([]);
 
-        $this->command->info('Roles and permissions seeded successfully.');
+        if ($this->command) {
+            $this->command->info('Roles and permissions seeded successfully.');
+        }
     }
 }

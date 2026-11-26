@@ -28,6 +28,13 @@ class AcademicSessionController extends Controller
         return Inertia::render('Academic/Sessions/Index', [
             'sessions' => $sessions,
             'currentSession' => $currentSession,
+            'can' => [
+                'sessions.create'   => $request->user()->hasPermissionTo('sessions.create'),
+                'sessions.edit'     => $request->user()->hasPermissionTo('sessions.edit'),
+                'sessions.activate' => $request->user()->hasPermissionTo('sessions.activate'),
+                'sessions.delete'   => $request->user()->hasPermissionTo('sessions.delete'),
+                'terms.view'        => $request->user()->hasAnyPermission(['terms.view', 'academic.view']),
+            ],
         ]);
     }
 
@@ -67,7 +74,7 @@ class AcademicSessionController extends Controller
     /**
      * Display the specified academic session with its terms and classes.
      */
-    public function show(AcademicSession $session): Response
+    public function show(Request $request, AcademicSession $session): Response
     {
         $this->authorize('view', $session);
 
@@ -78,6 +85,12 @@ class AcademicSessionController extends Controller
 
         return Inertia::render('Academic/Sessions/Show', [
             'session' => $session,
+            'can' => [
+                'terms.create'   => $request->user()->hasPermissionTo('terms.create'),
+                'terms.edit'     => $request->user()->hasPermissionTo('terms.edit'),
+                'terms.activate' => $request->user()->hasPermissionTo('terms.activate'),
+                'terms.delete'   => $request->user()->hasPermissionTo('terms.delete'),
+            ],
         ]);
     }
 

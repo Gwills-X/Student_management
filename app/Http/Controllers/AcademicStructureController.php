@@ -15,7 +15,7 @@ class AcademicStructureController extends Controller
     /**
      * Display listing of stages and class levels.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $this->authorize('viewAny', EducationStage::class);
 
@@ -24,8 +24,19 @@ class AcademicStructureController extends Controller
             ->orderBy('display_order')
             ->get();
 
+        $canManageStages = $request->user()->hasPermissionTo('stages.manage');
+        $canManageLevels = $request->user()->hasPermissionTo('class_levels.manage');
+
         return Inertia::render('Academic/Structure/Index', [
             'stages' => $stages,
+            'can' => [
+                'stages.manage'       => $canManageStages,
+                'stages.edit'         => $canManageStages,
+                'stages.toggle'       => $canManageStages,
+                'class_levels.manage' => $canManageLevels,
+                'class_levels.edit'   => $canManageLevels,
+                'class_levels.toggle' => $canManageLevels,
+            ],
         ]);
     }
 

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Show({ session }) {
+export default function Show({ session, can = {} }) {
     const [addTermModalOpen, setAddTermModalOpen] = useState(false);
     const [editTermModalOpen, setEditTermModalOpen] = useState(false);
     const [selectedTerm, setSelectedTerm] = useState(null);
@@ -177,6 +177,7 @@ export default function Show({ session }) {
                                 Only one term across the entire school may be designated active current at any time.
                             </p>
                         </div>
+                        {can["terms.create"] && (
                         <button
                             type="button"
                             onClick={() => setAddTermModalOpen(true)}
@@ -185,6 +186,7 @@ export default function Show({ session }) {
                             <Plus className="w-4 h-4 text-primary-600" />
                             <span>Add Term</span>
                         </button>
+                        )}
                     </div>
 
                     {session.terms && session.terms.length > 0 ? (
@@ -233,7 +235,7 @@ export default function Show({ session }) {
                                             </td>
                                             <td className="py-3 px-3 text-right">
                                                 <div className="inline-flex items-center gap-1.5">
-                                                    {!t.is_current && (
+                                                    {can["terms.activate"] && !t.is_current && (
                                                         <button
                                                             type="button"
                                                             onClick={() => triggerMakeCurrentTerm(t)}
@@ -242,6 +244,7 @@ export default function Show({ session }) {
                                                             Make Current
                                                         </button>
                                                     )}
+                                                    {can["terms.edit"] && (
                                                     <button
                                                         type="button"
                                                         onClick={() => openEditTermModal(t)}
@@ -250,7 +253,8 @@ export default function Show({ session }) {
                                                     >
                                                         <Pencil className="w-3.5 h-3.5" />
                                                     </button>
-                                                    {!t.is_current && (
+                                                    )}
+                                                    {can["terms.delete"] && !t.is_current && (
                                                         <button
                                                             type="button"
                                                             onClick={() => triggerDeleteTerm(t)}

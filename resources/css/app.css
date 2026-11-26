@@ -23,3 +23,29 @@
     --color-primary-900: #1e3a8a;
     --color-primary-950: #172554;
 }
+
+.sidebar-scrollbar {
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(147, 197, 253, 0.35) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(147, 197, 253, 0.35);
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-clip: padding-box;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: rgba(147, 197, 253, 0.55);
+    background-clip: padding-box;
+}

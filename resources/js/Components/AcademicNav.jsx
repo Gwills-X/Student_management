@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import {
     BookOpen,
     Calendar,
@@ -7,16 +8,19 @@ import {
 } from 'lucide-react';
 
 export default function AcademicNav({ currentTab = 'sessions' }) {
+    const { auth } = usePage().props;
+    const permissions = auth?.user?.permissions || [];
+    const can = (permission) => permissions.includes(permission);
     const tabs = [
-        { id: 'sessions', label: 'Sessions & Terms', href: '/academic/sessions', icon: Calendar },
-        { id: 'structure', label: 'Stages & Levels', href: '/academic/structure', icon: Layers },
-        { id: 'classes', label: 'Classes & Arms', href: '/academic/classes', icon: School },
-        { id: 'subjects', label: 'Subjects Catalog', href: '/academic/subjects', icon: BookOpen },
+        { id: 'sessions', label: 'Sessions & Terms', href: '/academic/sessions', icon: Calendar, visible: can('sessions.view') || can('academic.view') },
+        { id: 'structure', label: 'Stages & Levels', href: '/academic/structure', icon: Layers, visible: can('stages.view') || can('class_levels.view') || can('academic.view') },
+        { id: 'classes', label: 'Classes & Arms', href: '/academic/classes', icon: School, visible: can('classes.view') || can('academic.view') },
+        { id: 'subjects', label: 'Subjects Catalog', href: '/academic/subjects', icon: BookOpen, visible: can('subjects.view') || can('academic.view') },
     ];
 
     return (
         <div className="bg-white rounded-2xl border border-gray-200 p-1.5 shadow-xs flex items-center gap-1 overflow-x-auto">
-            {tabs.map((tab) => {
+            {tabs.filter((tab) => tab.visible).map((tab) => {
                 const Icon = tab.icon;
                 const isActive = currentTab === tab.id;
                 return (

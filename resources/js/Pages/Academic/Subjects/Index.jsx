@@ -16,7 +16,7 @@ import {
     Eye,
 } from 'lucide-react';
 
-export default function Index({ subjects = { data: [] }, stages = [], filters = {} }) {
+export default function Index({ subjects = { data: [] }, stages = [], filters = {}, can = {} }) {
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [selectedStage, setSelectedStage] = useState(filters.stage_id || '');
     const [selectedStatus, setSelectedStatus] = useState(filters.status || '');
@@ -147,6 +147,7 @@ export default function Index({ subjects = { data: [] }, stages = [], filters = 
                             </p>
                         </div>
 
+                        {can["subjects.create"] && (
                         <div>
                             <button
                                 type="button"
@@ -157,6 +158,7 @@ export default function Index({ subjects = { data: [] }, stages = [], filters = 
                                 <span>Create Subject</span>
                             </button>
                         </div>
+                        )}
                     </div>
 
                     {/* Filter Bar */}
@@ -304,6 +306,7 @@ export default function Index({ subjects = { data: [] }, stages = [], filters = 
                                                     >
                                                         <Eye className="w-4 h-4" />
                                                     </Link>
+                                                    {can["subjects.edit"] && (
                                                     <button
                                                         type="button"
                                                         onClick={() => openEditModal(subject)}
@@ -312,6 +315,8 @@ export default function Index({ subjects = { data: [] }, stages = [], filters = 
                                                     >
                                                         <Edit3 className="w-4 h-4" />
                                                     </button>
+                                                    )}
+                                                    {can["subjects.delete"] && (
                                                     <button
                                                         type="button"
                                                         onClick={() => setSubjectToDelete(subject)}
@@ -320,6 +325,7 @@ export default function Index({ subjects = { data: [] }, stages = [], filters = 
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

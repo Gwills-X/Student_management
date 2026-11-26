@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({ sessions = [], currentSession = null }) {
+export default function Index({ sessions = [], currentSession = null, can = {} }) {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -130,6 +130,7 @@ export default function Index({ sessions = [], currentSession = null }) {
                             Manage school academic years, term timelines, and active operational indicators.
                         </p>
                     </div>
+                    {can["sessions.create"] && (
                     <button
                         type="button"
                         onClick={() => {
@@ -141,6 +142,7 @@ export default function Index({ sessions = [], currentSession = null }) {
                         <Plus className="w-4 h-4" />
                         <span>Create Academic Session</span>
                     </button>
+                    )}
                 </div>
 
                 {/* Current Active Banner */}
@@ -256,7 +258,7 @@ export default function Index({ sessions = [], currentSession = null }) {
                                         {/* Actions */}
                                         <td className="py-3.5 px-4 text-right">
                                             <div className="inline-flex items-center gap-1.5">
-                                                {!s.is_current && (
+                                                {can["sessions.activate"] && !s.is_current && (
                                                     <button
                                                         type="button"
                                                         onClick={() => triggerMakeCurrent(s)}
@@ -272,6 +274,7 @@ export default function Index({ sessions = [], currentSession = null }) {
                                                 >
                                                     <Eye className="w-4 h-4" />
                                                 </Link>
+                                                {can["sessions.edit"] && (
                                                 <button
                                                     type="button"
                                                     onClick={() => openEditModal(s)}
@@ -280,7 +283,8 @@ export default function Index({ sessions = [], currentSession = null }) {
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </button>
-                                                {!s.is_current && s.terms_count === 0 && s.classes_count === 0 && (
+                                                )}
+                                                {can["sessions.delete"] && !s.is_current && s.terms_count === 0 && s.classes_count === 0 && (
                                                     <button
                                                         type="button"
                                                         onClick={() => triggerDelete(s)}

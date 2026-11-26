@@ -18,7 +18,7 @@ import {
     Check,
 } from 'lucide-react';
 
-export default function Show({ schoolClass, availableSubjects = [] }) {
+export default function Show({ schoolClass, availableSubjects = [], can = {} }) {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -223,6 +223,8 @@ export default function Show({ schoolClass, availableSubjects = [] }) {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            {can["class_subjects.manage"] && (
+                            <>
                             <button
                                 type="button"
                                 onClick={() => {
@@ -242,6 +244,8 @@ export default function Show({ schoolClass, availableSubjects = [] }) {
                                 <Plus className="w-4 h-4" />
                                 <span>Assign Subject</span>
                             </button>
+                            </>
+                            )}
                         </div>
                     </div>
 
@@ -332,6 +336,7 @@ export default function Show({ schoolClass, availableSubjects = [] }) {
                                                 </span>
                                             </td>
                                             <td className="py-4 px-6 text-right">
+                                                {can["class_subjects.manage"] && (
                                                 <button
                                                     type="button"
                                                     onClick={() => setSubjectToRemove(subject)}
@@ -340,6 +345,7 @@ export default function Show({ schoolClass, availableSubjects = [] }) {
                                                     <Trash2 className="w-3.5 h-3.5" />
                                                     <span>Remove</span>
                                                 </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

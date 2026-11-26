@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\EmployeeCategoriesSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -72,6 +73,9 @@ class AuthenticationFoundationTest extends TestCase
 
     public function test_authenticated_user_can_view_dashboard_and_logout(): void
     {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(EmployeeCategoriesSeeder::class);
+
         $user = User::factory()->create([
             'username' => 'principal01',
         ]);

@@ -1,6 +1,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
+    ClipboardCheck,
     BookOpen,
     Calendar,
     CheckCircle2,
@@ -42,15 +43,104 @@ function NavLink({ href, icon: Icon, label, active = false, badge = null }) {
     );
 }
 
+function NavSection({ title, children }) {
+    return (
+        <div className="pt-4">
+            <p className="px-3 pb-1 text-[11px] font-bold text-primary-400/80 uppercase tracking-wider">
+                {title}
+            </p>
+            <div className="space-y-1.5">{children}</div>
+        </div>
+    );
+}
+
 export default function AuthenticatedLayout({ title = 'School Management', children }) {
     const { auth, flash } = usePage().props;
     const user = auth?.user || {};
+    const permissions = user.permissions || [];
+    const can = (permission) => permissions.includes(permission);
+    const canAny = (...perms) => perms.some((p) => permissions.includes(p));
+
+    const currentUrl = window.location.pathname;
+
+    /*
+     * Single source of truth for navigation. Every item declares the Spatie
+     * permissions required to see it — role names are never used here. An item
+     * (or its whole section) only renders when the authenticated user holds at
+     * least one of the required permissions.
+     */
+    const navigation = [
+        {
+            section: 'Main Menu',
+            items: [
+                {
+                    label: 'Dashboard',
+                    href: '/dashboard',
+                    icon: LayoutDashboard,
+                    active: currentUrl === '/dashboard',
+                    permissions: [], // always available to authenticated users
+                },
+                {
+                    label: 'Employees',
+                    href: '/employees',
+                    icon: Users,
+                    active: currentUrl.startsWith('/employees'),
+                    permissions: ['employees.view'],
+                },
+                {
+                    label: 'User Accounts',
+                    href: '/users',
+                    icon: UserCheck,
+                    active: currentUrl.startsWith('/users'),
+                    permissions: ['users.view'],
+                },
+                {
+                    label: 'Admissions',
+                    href: '/admissions',
+                    icon: ClipboardCheck,
+                    active: currentUrl.startsWith('/admissions'),
+                    permissions: ['admissions.view'],
+                },
+            ].filter((item) => canAny(...item.permissions)),
+        },
+        {
+            section: 'Academic Setup',
+            items: [
+                {
+                    label: 'Sessions & Terms',
+                    href: '/academic/sessions',
+                    icon: Calendar,
+                    active: currentUrl.startsWith('/academic/sessions'),
+                    permissions: ['sessions.view', 'terms.view', 'academic.view'],
+                },
+                {
+                    label: 'Stages & Levels',
+                    href: '/academic/structure',
+                    icon: Layers,
+                    active: currentUrl.startsWith('/academic/structure'),
+                    permissions: ['stages.view', 'class_levels.view', 'academic.view'],
+                },
+                {
+                    label: 'Classes & Arms',
+                    href: '/academic/classes',
+                    icon: School,
+                    active: currentUrl.startsWith('/academic/classes'),
+                    permissions: ['classes.view', 'academic.view'],
+                },
+                {
+                    label: 'Subjects',
+                    href: '/academic/subjects',
+                    icon: BookOpen,
+                    active: currentUrl.startsWith('/academic/subjects'),
+                    permissions: ['subjects.view', 'academic.view'],
+                },
+            ].filter((item) => canAny(...item.permissions)),
+        },
+    ].filter((section) => section.items.length > 0);
 
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [flashVisible, setFlashVisible] = useState(true);
-
-    const currentUrl = window.location.pathname;
 
     function handleLogout() {
         router.post('/logout');
@@ -101,59 +191,20 @@ export default function AuthenticatedLayout({ title = 'School Management', child
                     </div>
 
                     {/* Navigation Links */}
-                    <nav className="flex-1 px-3 py-5 space-y-1.5 overflow-y-auto">
-                        <p className="px-3 pb-1 text-[11px] font-bold text-primary-400/80 uppercase tracking-wider">
-                            Main Menu
-                        </p>
-                        <NavLink
-                            href="/dashboard"
-                            icon={LayoutDashboard}
-                            label="Dashboard"
-                            active={currentUrl === '/dashboard'}
-                        />
-                        <NavLink
-                            href="/employees"
-                            icon={Users}
-                            label="Employees"
-                            active={currentUrl.startsWith('/employees')}
-                        />
-                        <NavLink
-                            href="/users"
-                            icon={UserCheck}
-                            label="User Accounts"
-                            active={currentUrl.startsWith('/users')}
-                        />
-
-                        {/* Stage 3: Academic Management */}
-                        <div className="pt-4">
-                            <p className="px-3 pb-1 text-[11px] font-bold text-primary-400/80 uppercase tracking-wider">
-                                Academic Setup
-                            </p>
-                            <NavLink
-                                href="/academic/sessions"
-                                icon={Calendar}
-                                label="Sessions &amp; Terms"
-                                active={currentUrl.startsWith('/academic/sessions')}
-                            />
-                            <NavLink
-                                href="/academic/structure"
-                                icon={Layers}
-                                label="Stages &amp; Levels"
-                                active={currentUrl.startsWith('/academic/structure')}
-                            />
-                            <NavLink
-                                href="/academic/classes"
-                                icon={School}
-                                label="Classes &amp; Arms"
-                                active={currentUrl.startsWith('/academic/classes')}
-                            />
-                            <NavLink
-                                href="/academic/subjects"
-                                icon={BookOpen}
-                                label="Subjects"
-                                active={currentUrl.startsWith('/academic/subjects')}
-                            />
-                        </div>
+                    <nav className="sidebar-scrollbar flex-1 px-3 py-5 space-y-1.5 overflow-y-auto overscroll-contain">
+                        {navigation.map((section) => (
+                            <NavSection key={section.section} title={section.section}>
+                                {section.items.map((item) => (
+                                    <NavLink
+                                        key={item.href}
+                                        href={item.href}
+                                        icon={item.icon}
+                                        label={item.label}
+                                        active={item.active}
+                                    />
+                                ))}
+                            </NavSection>
+                        ))}
                     </nav>
 
                     {/* Stage 3 Active Status & Logout Footer */}

@@ -56,6 +56,11 @@ class SchoolClassController extends Controller
                 'level_id' => $levelId,
                 'search' => $search,
             ],
+            'can' => [
+                'classes.create' => $request->user()->hasPermissionTo('classes.create'),
+                'classes.edit'   => $request->user()->hasPermissionTo('classes.edit'),
+                'classes.delete' => $request->user()->hasPermissionTo('classes.delete'),
+            ],
         ]);
     }
 
@@ -143,7 +148,7 @@ class SchoolClassController extends Controller
     /**
      * Display class details and its assigned subjects.
      */
-    public function show(SchoolClass $class): Response
+    public function show(Request $request, SchoolClass $class): Response
     {
         $this->authorize('view', $class);
 
@@ -164,6 +169,9 @@ class SchoolClassController extends Controller
         return Inertia::render('Academic/Classes/Show', [
             'schoolClass' => $class,
             'availableSubjects' => $availableSubjects,
+            'can' => [
+                'class_subjects.manage' => $request->user()->hasPermissionTo('class_subjects.manage'),
+            ],
         ]);
     }
 

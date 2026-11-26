@@ -3,6 +3,9 @@
 use App\Http\Controllers\AcademicSessionController;
 use App\Http\Controllers\AcademicStructureController;
 use App\Http\Controllers\AcademicTermController;
+use App\Http\Controllers\AdmissionAssessmentController;
+use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AdmissionDocumentController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ClassSubjectController;
 use App\Http\Controllers\DashboardController;
@@ -108,6 +111,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/academic/classes/{class}/subjects', [ClassSubjectController::class, 'store'])->name('academic.classes.subjects.store');
     Route::post('/academic/classes/{class}/subjects/bulk-sync', [ClassSubjectController::class, 'bulkSync'])->name('academic.classes.subjects.bulk-sync');
     Route::delete('/academic/classes/{class}/subjects/{subject}', [ClassSubjectController::class, 'destroy'])->name('academic.classes.subjects.destroy');
+
+    // ── Admission Management (Stage 4) ─────────────────────────────────────
+    Route::get('/admissions', [AdmissionController::class, 'dashboard'])->name('admissions.dashboard');
+    Route::get('/admissions/applications', [AdmissionController::class, 'index'])->name('admissions.index');
+    Route::get('/admissions/applications/create', [AdmissionController::class, 'create'])->name('admissions.create');
+    Route::post('/admissions/applicants', [AdmissionController::class, 'storeApplicant'])->name('admissions.applicants.store');
+    Route::post('/admissions/applications', [AdmissionController::class, 'store'])->name('admissions.store');
+    Route::get('/admissions/applications/{application}', [AdmissionController::class, 'show'])->name('admissions.show');
+    Route::patch('/admissions/applications/{application}/status', [AdmissionController::class, 'changeStatus'])->name('admissions.status');
+    Route::post('/admissions/applications/{application}/convert', [AdmissionController::class, 'convert'])->name('admissions.convert');
+
+    Route::post('/admissions/applications/{application}/assessments', [AdmissionAssessmentController::class, 'store'])->name('admissions.assessments.store');
+    Route::delete('/admissions/applications/{application}/assessments/{assessment}', [AdmissionAssessmentController::class, 'destroy'])->name('admissions.assessments.destroy');
+
+    Route::post('/admissions/applications/{application}/documents', [AdmissionDocumentController::class, 'store'])->name('admissions.documents.store');
+    Route::post('/admissions/applications/{application}/documents/{document}/replace', [AdmissionDocumentController::class, 'replace'])->name('admissions.documents.replace');
+    Route::get('/admissions/applications/{application}/documents/{document}/view', [AdmissionDocumentController::class, 'view'])->name('admissions.documents.view');
+    Route::get('/admissions/applications/{application}/documents/{document}/download', [AdmissionDocumentController::class, 'download'])->name('admissions.documents.download');
+    Route::delete('/admissions/applications/{application}/documents/{document}', [AdmissionDocumentController::class, 'destroy'])->name('admissions.documents.destroy');
 });
 
 // ── Root redirect ──────────────────────────────────────────────────────────

@@ -22,5 +22,34 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Render the branded "Access Denied" page for authorization failures.
+        // The original message (which may name policies/resources) is never
+        // passed to the client — only the generic status + shared auth data.
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, \Illuminate\Http\Request $request) {
+            if ($request->inertia()) {
+                return \Inertia\Inertia::render('AccessDenied')
+                    ->toResponse($request)
+                    ->setStatusCode(403);
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Access denied.'], 403);
+            }
+
+            return response()->view('errors.403', ['status' => 403], 403);
+        });
+
+        $exceptions->render(function (\Spatie\Permission\Exceptions\UnauthorizedException $e, \Illuminate\Http\Request $request) {
+            if ($request->inertia()) {
+                return \Inertia\Inertia::render('AccessDenied')
+                    ->toResponse($request)
+                    ->setStatusCode(403);
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Access denied.'], 403);
+            }
+
+            return response()->view('errors.403', ['status' => 403], 403);
+        });
     })->create();

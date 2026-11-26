@@ -44,6 +44,11 @@ class SubjectController extends Controller
                 'search' => $search,
                 'status' => $status,
             ],
+            'can' => [
+                'subjects.create' => $request->user()->hasPermissionTo('subjects.create'),
+                'subjects.edit'   => $request->user()->hasPermissionTo('subjects.edit'),
+                'subjects.delete' => $request->user()->hasPermissionTo('subjects.delete'),
+            ],
         ]);
     }
 

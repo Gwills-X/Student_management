@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Index({ stages = [] }) {
+export default function Index({ stages = [], can = {} }) {
     const [addStageModalOpen, setAddStageModalOpen] = useState(false);
     const [editStageModalOpen, setEditStageModalOpen] = useState(false);
     const [selectedStage, setSelectedStage] = useState(null);
@@ -163,6 +163,7 @@ export default function Index({ stages = [] }) {
                             Configure school instructional stages (e.g. Primary, Junior Secondary) and progressive grade levels (e.g. JSS1, JSS2).
                         </p>
                     </div>
+                    {can["stages.manage"] && (
                     <button
                         type="button"
                         onClick={() => {
@@ -174,6 +175,7 @@ export default function Index({ stages = [] }) {
                         <Plus className="w-4 h-4" />
                         <span>Add Education Stage</span>
                     </button>
+                    )}
                 </div>
 
                 {/* Stages & Levels Listing */}
@@ -203,6 +205,7 @@ export default function Index({ stages = [] }) {
                                 </div>
 
                                 <div className="flex items-center gap-2">
+                                    {can["class_levels.manage"] && (
                                     <button
                                         type="button"
                                         onClick={() => openAddLevelModal(stage.id)}
@@ -211,6 +214,8 @@ export default function Index({ stages = [] }) {
                                         <Plus className="w-3.5 h-3.5" />
                                         <span>Add Class Level</span>
                                     </button>
+                                    )}
+                                    {can["stages.edit"] && (
                                     <button
                                         type="button"
                                         onClick={() => openEditStageModal(stage)}
@@ -219,6 +224,8 @@ export default function Index({ stages = [] }) {
                                     >
                                         <Pencil className="w-4 h-4" />
                                     </button>
+                                    )}
+                                    {can["stages.toggle"] && (
                                     <button
                                         type="button"
                                         onClick={() => toggleStageActive(stage)}
@@ -229,6 +236,7 @@ export default function Index({ stages = [] }) {
                                     >
                                         <Power className="w-4 h-4" />
                                     </button>
+                                    )}
                                 </div>
                             </div>
 
@@ -272,6 +280,7 @@ export default function Index({ stages = [] }) {
                                                     </td>
                                                     <td className="py-3 px-6 text-right">
                                                         <div className="inline-flex items-center gap-1.5">
+                                                            {can["class_levels.edit"] && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => openEditLevelModal(lvl)}
@@ -280,6 +289,8 @@ export default function Index({ stages = [] }) {
                                                             >
                                                                 <Pencil className="w-3.5 h-3.5" />
                                                             </button>
+                                                            )}
+                                                            {can["class_levels.toggle"] && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => toggleLevelActive(lvl)}
@@ -290,6 +301,7 @@ export default function Index({ stages = [] }) {
                                                             >
                                                                 <Power className="w-3.5 h-3.5" />
                                                             </button>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>

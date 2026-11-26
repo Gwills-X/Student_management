@@ -25,6 +25,7 @@ export default function Index({
     stages = [],
     classLevels = [],
     filters = {},
+    can = {},
 }) {
     const [sessionId, setSessionId] = useState(selectedSessionId || '');
     const [stageId, setStageId] = useState(filters.stage_id || '');
@@ -67,6 +68,7 @@ export default function Index({
                             Manage session-specific class divisions (e.g. JSS 1A, JSS 1B, Primary 2 Gold) and subject offerings.
                         </p>
                     </div>
+                    {can["classes.create"] && (
                     <Link
                         href="/academic/classes/create"
                         className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold shadow-xs transition-colors"
@@ -74,6 +76,7 @@ export default function Index({
                         <Plus className="w-4 h-4" />
                         <span>Register New Class</span>
                     </Link>
+                    )}
                 </div>
 
                 {/* Filter and Session Selector Bar */}
@@ -187,6 +190,7 @@ export default function Index({
                             <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
                                 No classes configured for this academic session matching your filters.
                             </p>
+                            {can["classes.create"] && (
                             <Link
                                 href="/academic/classes/create"
                                 className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-xs transition-colors"
@@ -194,6 +198,7 @@ export default function Index({
                                 <Plus className="w-3.5 h-3.5" />
                                 <span>Register New Class</span>
                             </Link>
+                            )}
                         </div>
                     ) : (
                         <div className="overflow-x-auto">

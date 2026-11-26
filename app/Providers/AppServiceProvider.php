@@ -9,6 +9,7 @@ use App\Models\ClassLevel;
 use App\Models\EducationStage;
 use App\Models\Employee;
 use App\Models\SchoolClass;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\User;
 use App\Policies\AcademicSessionPolicy;
@@ -18,6 +19,7 @@ use App\Policies\ClassLevelPolicy;
 use App\Policies\EducationStagePolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\SchoolClassPolicy;
+use App\Policies\StudentPolicy;
 use App\Policies\SubjectPolicy;
 use App\Policies\UserPolicy;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -59,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(SchoolClass::class, SchoolClassPolicy::class);
         Gate::policy(Subject::class, SubjectPolicy::class);
         Gate::policy(AdmissionApplication::class, AdmissionApplicationPolicy::class);
+        Gate::policy(Student::class, StudentPolicy::class);
 
         // Super Administrator bypass for all gate checks
         Gate::before(function ($user, $ability) {

@@ -81,6 +81,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'admissions.withdraw',
             'admissions.convert',
             'admissions.manage_documents',
+
+            // Stage 5: Student Management & Enrolment
+            'students.view',
+            'students.view_all',
+            'students.edit',
+            'students.view_documents',
+            'students.manage_documents',
+            'students.view_history',
+            'students.change_status',
+            'students.enrol',
+            'students.transfer',
+            'students.progress',
+            'students.view_class_lists',
         ];
 
         foreach ($permissions as $permission) {
@@ -159,6 +172,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'admissions.withdraw',
             'admissions.convert',
             'admissions.manage_documents',
+
+            // Stage 5: student management & enrolment
+            'students.view',
+            'students.view_all',
+            'students.edit',
+            'students.view_documents',
+            'students.manage_documents',
+            'students.view_history',
+            'students.change_status',
+            'students.enrol',
+            'students.transfer',
+            'students.progress',
+            'students.view_class_lists',
         ]);
 
         // Principal: oversight permissions
@@ -193,6 +219,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'classes.view',
             'subjects.view',
             'admissions.view',
+            'students.view',
+            'students.view_all',
+            'students.view_history',
         ]);
 
         // Registrar: admissions ownership only. Registrars manage applicants,
@@ -218,6 +247,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'admissions.withdraw',
             'admissions.convert',
             'admissions.manage_documents',
+
+            // Stage 5: registrars access admission-related student records.
+            // Enrolment access is only granted when explicitly assigned.
+            'students.view',
+            'students.view_all',
+            'students.view_documents',
+            'students.view_history',
         ]);
 
         // Teacher: read-only access to academic classes and subjects.

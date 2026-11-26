@@ -192,6 +192,13 @@ export default function Show({ schoolClass, availableSubjects = [], can = {} }) 
                                 <Edit3 className="w-4 h-4 text-gray-500" />
                                 <span>Edit Class</span>
                             </button>
+                            <Link
+                                href={route("academic.classes.students", schoolClass.id)}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold shadow-xs transition-colors"
+                            >
+                                <Users className="w-4 h-4 text-gray-500" />
+                                <span>Student List</span>
+                            </Link>
                             <button
                                 type="button"
                                 onClick={() => setIsDeleteOpen(true)}

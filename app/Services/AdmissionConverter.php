@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AdmissionApplication;
 use App\Models\Student;
+use App\Models\StudentStatusHistory;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -43,6 +44,37 @@ class AdmissionConverter
                 'admission_application_id' => $application->id,
                 'admission_date' => now()->toDateString(),
                 'status' => 'Active',
+
+                // Stage 5: copy biodata from the application. The application
+                // itself is never modified and remains the historical record.
+                'date_of_birth' => $application->date_of_birth,
+                'gender' => $application->gender,
+                'nationality' => $application->nationality,
+                'state_of_origin' => $application->state_of_origin,
+                'lga' => $application->lga,
+                'residential_address' => $application->residential_address,
+                'phone_number' => $application->phone_number,
+                'guardian_name' => $application->guardian_name,
+                'guardian_relationship' => $application->guardian_relationship,
+                'guardian_phone' => $application->guardian_phone,
+                'guardian_email' => $application->guardian_email,
+                'guardian_address' => $application->guardian_address,
+                'emergency_contact_name' => $application->guardian_name,
+                'emergency_contact_phone' => $application->guardian_phone,
+                'emergency_contact_relationship' => $application->guardian_relationship,
+                'created_by' => $staff->id,
+            ]);
+
+            // Stage 5 rule: admission conversion and class enrolment are kept
+            // logically distinct. The initial actual-class placement is created
+            // through StudentEnrolmentService by authorised personnel, not here.
+            StudentStatusHistory::create([
+                'student_id' => $student->id,
+                'from_status' => null,
+                'to_status' => 'Active',
+                'remarks' => "Converted from admission application {$application->application_number}.",
+                'changed_by' => $staff->id,
+                'changed_at' => now(),
             ]);
 
             $applicant->assignRole('Student');

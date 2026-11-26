@@ -13,6 +13,8 @@ use App\Http\Controllers\EmployeeAccountController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeDocumentController;
 use App\Http\Controllers\SchoolClassController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -130,6 +132,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/admissions/applications/{application}/documents/{document}/view', [AdmissionDocumentController::class, 'view'])->name('admissions.documents.view');
     Route::get('/admissions/applications/{application}/documents/{document}/download', [AdmissionDocumentController::class, 'download'])->name('admissions.documents.download');
     Route::delete('/admissions/applications/{application}/documents/{document}', [AdmissionDocumentController::class, 'destroy'])->name('admissions.documents.destroy');
+
+    // ── Student Management (Stage 5) ─────────────────────────────────────
+    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/progression', [StudentController::class, 'progression'])->name('students.progression');
+    Route::post('/students/progression/bulk', [StudentController::class, 'bulkProgress'])->name('students.progression.bulk');
+    Route::get('/my-student-profile', [StudentController::class, 'myProfile'])->name('students.my-profile');
+
+    Route::get('/students/{student}', [StudentController::class, 'show'])->name('students.show');
+    Route::get('/students/{student}/edit', [StudentController::class, 'edit'])->name('students.edit');
+    Route::put('/students/{student}', [StudentController::class, 'update'])->name('students.update');
+    Route::patch('/students/{student}/status', [StudentController::class, 'changeStatus'])->name('students.status.update');
+    Route::post('/students/{student}/enrol', [StudentController::class, 'enrol'])->name('students.enrol');
+    Route::post('/students/{student}/transfer', [StudentController::class, 'transfer'])->name('students.transfer');
+
+    // ── Student Documents (Stage 5) ─────────────────────────────────────
+    Route::post('/students/{student}/documents', [StudentDocumentController::class, 'store'])->name('students.documents.store');
+    Route::get('/students/{student}/documents/{document}/view', [StudentDocumentController::class, 'view'])->name('students.documents.view');
+    Route::get('/students/{student}/documents/{document}/download', [StudentDocumentController::class, 'download'])->name('students.documents.download');
+    Route::delete('/students/{student}/documents/{document}', [StudentDocumentController::class, 'destroy'])->name('students.documents.destroy');
+
+    // ── Class Student Lists (Stage 5) ─────────────────────────────────
+    Route::get('/academic/classes/{class}/students', [StudentController::class, 'classList'])->name('academic.classes.students');
 });
 
 // ── Root redirect ──────────────────────────────────────────────────────────

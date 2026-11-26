@@ -1,12 +1,13 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
-    ClipboardCheck,
     BookOpen,
+    ClipboardCheck,
+    GraduationCap,
+    UserCog,
     Calendar,
     CheckCircle2,
     ChevronDown,
-    GraduationCap,
     Layers,
     LayoutDashboard,
     LogOut,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import RoleBadge from '@/Components/RoleBadge';
+import StudentPortalNav from '@/Components/StudentPortalNav';
 
 function NavLink({ href, icon: Icon, label, active = false, badge = null }) {
     return (
@@ -100,6 +102,25 @@ export default function AuthenticatedLayout({ title = 'School Management', child
                     icon: ClipboardCheck,
                     active: currentUrl.startsWith('/admissions'),
                     permissions: ['admissions.view'],
+                },
+            ].filter((item) => canAny(...item.permissions)),
+        },
+        {
+            section: 'Student Management',
+            items: [
+                {
+                    label: 'Student Directory',
+                    href: '/students',
+                    icon: GraduationCap,
+                    active: currentUrl === '/students' || currentUrl.startsWith('/students/'),
+                    permissions: ['students.view'],
+                },
+                {
+                    label: 'Session Progression',
+                    href: '/students/progression',
+                    icon: UserCog,
+                    active: currentUrl.startsWith('/students/progression'),
+                    permissions: ['students.progress'],
                 },
             ].filter((item) => canAny(...item.permissions)),
         },
@@ -205,6 +226,7 @@ export default function AuthenticatedLayout({ title = 'School Management', child
                                 ))}
                             </NavSection>
                         ))}
+                        <StudentPortalNav active={currentUrl} />
                     </nav>
 
                     {/* Stage 3 Active Status & Logout Footer */}

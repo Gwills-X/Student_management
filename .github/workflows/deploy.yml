@@ -1,11 +1,14 @@
 name: Deploy School Management System
 
+# Automatically deploy whenever changes are pushed to main.
+# Also allow manual deployment from GitHub Actions.
 on:
   push:
     branches:
       - main
   workflow_dispatch:
 
+# Give the workflow permission to read repository contents.
 permissions:
   contents: read
 
@@ -15,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Get the latest project files
+      # Get the latest project files from GitHub.
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configure PHP
+      # Configure PHP for the Laravel application.
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -27,26 +30,30 @@ jobs:
           extensions: mbstring, bcmath, ctype, fileinfo, json, openssl, pdo, pdo_mysql, tokenizer, xml, curl
           coverage: none
 
-      # Install production PHP dependencies
+      # Install production PHP dependencies.
+      # Use file-based caching during Composer's package discovery.
+      # This prevents Laravel from trying to access a missing SQLite database.
       - name: Install Composer dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+        env:
+          CACHE_STORE: file
 
-      # Configure Node.js
+      # Configure Node.js for the React and Vite frontend.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
 
-      # Install frontend dependencies
+      # Install frontend dependencies from package-lock.json.
       - name: Install NPM dependencies
         run: npm ci
 
-      # Build React and Vite assets
+      # Build the production frontend assets.
       - name: Build frontend
         run: npm run build
 
-      # Upload the application to InfinityFree
+      # Upload the application files to InfinityFree.
       - name: Deploy to InfinityFree
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -59,7 +66,7 @@ jobs:
           server-dir: /htdocs/
           dangerous-clean-slate: false
 
-          # Protect important files and folders
+          # Protect important files and folders from deployment.
           exclude: |
             **/.git*
             **/.git*/**

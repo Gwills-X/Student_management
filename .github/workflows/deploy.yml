@@ -67,16 +67,36 @@ jobs:
           dangerous-clean-slate: false
 
           # Protect important files and folders from deployment.
+          # NOTE: storage/ is deliberately NOT excluded wholesale. The runtime
+          # skeleton (storage/framework/cache/data, sessions, views, logs and
+          # their .gitignore markers) MUST be uploaded, or a fresh server fails
+          # with "file_put_contents ... Failed to open stream" and
+          # "Please provide a valid cache path".
+          # Only runtime CONTENT is excluded; the directory markers upload.
           exclude: |
-            **/.git*
-            **/.git*/**
+            **/.git/**
             **/.github/**
             **/node_modules/**
             **/tests/**
             **/.env
             **/.env.*
-            **/storage/**
             **/database/*.sqlite
             **/public/storage/**
+            **/storage/app/**
+            !**/storage/app/.gitignore
+            !**/storage/app/private/.gitignore
+            !**/storage/app/public/.gitignore
+            **/storage/logs/*
+            !**/storage/logs/.gitignore
+            **/storage/framework/cache/data/*
+            !**/storage/framework/cache/data/.gitignore
+            **/storage/framework/sessions/*
+            !**/storage/framework/sessions/.gitignore
+            **/storage/framework/views/*
+            !**/storage/framework/views/.gitignore
+            **/storage/framework/testing/**
+            **/storage/inertia-devtools/**
+            **/storage/*.key
+            **/storage/pail/**
             **/.ftp-deploy-sync-state.json
             index2.html

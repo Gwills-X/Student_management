@@ -68,7 +68,12 @@ class AppServiceProvider extends ServiceProvider
             return $user->hasRole('Super Administrator') ? true : null;
         });
 
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        // NOTE: A boot-time forgetCachedPermissions() used to run here on every
+        // request, forcing Spatie to rebuild its permission map per hit —
+        // expensive and unnecessary. Spatie's registrar invalidates its cache
+        // automatically whenever roles/permissions are written through the
+        // package's own models, and the `roles:resync` command above flushes
+        // it explicitly after a manual re-seed.
 
         /**
          * Register a custom Eloquent user provider that authenticates

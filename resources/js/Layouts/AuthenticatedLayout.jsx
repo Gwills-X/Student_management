@@ -16,6 +16,7 @@ import {
     Shield,
     Users,
     UserCheck,
+    Wrench,
     X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -103,7 +104,17 @@ export default function AuthenticatedLayout({ title = 'School Management', child
                     active: currentUrl.startsWith('/admissions'),
                     permissions: ['admissions.view'],
                 },
-            ].filter((item) => canAny(...item.permissions)),
+                {
+                    label: 'Maintenance',
+                    href: '/admin/maintenance',
+                    icon: Wrench,
+                    active: currentUrl.startsWith('/admin/maintenance'),
+                    permissions: [],
+                    superAdminOnly: true,
+                },
+            ].filter((item) =>
+                item.superAdminOnly ? user.is_super_admin : canAny(...item.permissions),
+            ),
         },
         {
             section: 'Student Management',

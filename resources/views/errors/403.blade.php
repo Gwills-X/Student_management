@@ -59,7 +59,7 @@
         </div>
         <span class="badge">Error 403</span>
         <h1>Access Denied</h1>
-        <p>Your account does not have the required permission to view this page.</p>
+        <p>{{ $message ?? 'Your account does not have the required permission to view this page.' }}</p>
         <p>If you believe you should have access, contact a system administrator.</p>
         <a class="btn" href="{{ url('/dashboard') }}">Back to Dashboard</a>
     </main>

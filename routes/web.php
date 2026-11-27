@@ -17,6 +17,14 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentDocumentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Maintenance\CacheController;
+use App\Http\Controllers\Maintenance\DashboardController as MaintenanceDashboardController;
+use App\Http\Controllers\Maintenance\HistoryController;
+use App\Http\Controllers\Maintenance\MigrationController;
+use App\Http\Controllers\Maintenance\OptimizationController;
+use App\Http\Controllers\Maintenance\ReauthController;
+use App\Http\Controllers\Maintenance\SeederController;
+use App\Http\Controllers\Maintenance\StorageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -157,6 +165,49 @@ Route::middleware('auth')->group(function () {
 });
 
 // ── Root redirect ──────────────────────────────────────────────────────────
+// ── Root redirect ──────────────────────────────────────────────────
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
+
+// ── Production Deployment & Maintenance Panel ─────────────────────
+// Restricted to authenticated Super Administrators. Every mutating
+// operation is POST-only (CSRF protected), rate limited, lock-guarded
+// and requires a fresh deployment-password re-authentication. All
+// commands come from server-side allowlists (config/maintenance.php).
+Route::middleware(['auth', \App\Http\Middleware\EnsureMaintenanceAccess::class, \App\Http\Middleware\ThrottleMaintenance::class])
+    ->prefix('admin/maintenance')
+    ->name('maintenance.')
+    ->group(function () {
+
+        Route::get('/reauthenticate', [ReauthController::class, 'create'])->name('reauth');
+        Route::post('/reauthenticate', [ReauthController::class, 'store'])->name('reauth.attempt');
+
+        Route::get('/', [MaintenanceDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/diagnostics', [MaintenanceDashboardController::class, 'diagnostics'])->name('diagnostics');
+
+        Route::get('/migrations', [MigrationController::class, 'index'])->name('migrations.index');
+        // GET + POST share the same URL: GET renders confirmation, POST executes.
+        Route::get('/migrations/run', [MigrationController::class, 'confirm']);
+        Route::post('/migrations/run', [MigrationController::class, 'run'])->name('migrations.run');
+
+        Route::get('/seeders', [SeederController::class, 'index'])->name('seeders.index');
+        Route::get('/seeders/run', [SeederController::class, 'confirm']);
+        Route::post('/seeders/run', [SeederController::class, 'run'])->name('seeders.run');
+
+        Route::get('/cache', [CacheController::class, 'index'])->name('cache.index');
+        Route::get('/cache/clear', [CacheController::class, 'confirmClear']);
+        Route::post('/cache/clear', [CacheController::class, 'clear'])->name('cache.clear');
+        Route::get('/cache/rebuild', [CacheController::class, 'confirmRebuild']);
+        Route::post('/cache/rebuild', [CacheController::class, 'rebuild'])->name('cache.rebuild');
+
+        Route::get('/storage', [StorageController::class, 'index'])->name('storage.index');
+        Route::get('/storage/link', [StorageController::class, 'confirm']);
+        Route::post('/storage/link', [StorageController::class, 'link'])->name('storage.link');
+
+        Route::get('/optimization', [OptimizationController::class, 'index'])->name('optimization.index');
+        Route::get('/optimization/run', [OptimizationController::class, 'confirm']);
+        Route::post('/optimization/run', [OptimizationController::class, 'run'])->name('optimization.run');
+
+        Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    });

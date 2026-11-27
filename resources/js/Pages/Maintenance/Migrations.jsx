@@ -38,29 +38,87 @@ export default function MaintenanceMigrations({
             <MaintenanceLayout
                 title="Migrations"
                 heading="Database Migrations"
-                description="Migration tracking is not available because the migrations table does not exist."
+                description={
+                    db_connected === false
+                        ? "The database is not reachable — fix the connection before running migrations."
+                        : "First run on a fresh database: migration tracking is created together with the first migration batch."
+                }
             >
                 <Head title="Migrations — Maintenance" />
                 <MaintenanceNav />
-                <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-start gap-3 text-sm text-gray-600">
-                        <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                        <p>
-                            The{" "}
-                            <code className="bg-gray-100 px-1 rounded">
-                                migrations
-                            </code>{" "}
-                            table could not be found
-                            {db_connected === false
-                                ? " (the database is not reachable)"
-                                : ""}
-                            . Once the panel's own migration has been deployed,
-                            run pending migrations to initialise tracking.
-                        </p>
+                <ReauthBanner valid={reauth_valid} lifetime={900} />
+
+                {db_connected === false ? (
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                        <div className="flex items-start gap-3 text-sm text-gray-600">
+                            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                            <p>
+                                The application cannot connect to the database. Check the DB_HOST,
+                                DB_DATABASE, DB_USERNAME and DB_PASSWORD values in the server's .env
+                                file, then try again.
+                            </p>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <>
+                        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-5 text-sm text-amber-800 flex items-start gap-3">
+                            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <span>
+                                The{" "}
+                                <code className="bg-amber-100 px-1 rounded">migrations</code> table does
+                                not exist yet — this is normal for a fresh, empty production database.
+                                Running migrations now creates the tracking table together with the
+                                first batch of tables. Migrations can change production data
+                                permanently; back up first where possible.
+                            </span>
+                        </div>
+
+                        <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                <div className="flex-1">
+                                    <h2 className="font-semibold text-gray-900">
+                                        Run all migrations (initial run)
+                                    </h2>
+                                    <p className="text-sm text-gray-500 mt-0.5">
+                                        Executes{" "}
+                                        <code className="bg-gray-100 px-1 rounded">
+                                            migrate --force
+                                        </code>{" "}
+                                        on the server. Every migration file will run in order and
+                                        create the full database schema.
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setConfirming(true)}
+                                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 transition-colors"
+                                >
+                                    <PlayCircle className="w-4 h-4" />
+                                    Run Migrations
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
+
+                <ConfirmationModal
+                    isOpen={confirming}
+                    isDanger
+                    processing={processing}
+                    title="Run database migrations?"
+                    confirmText="Yes, run migrations"
+                    onClose={() => !processing && setConfirming(false)}
+                    onConfirm={run}
+                    message="This is the INITIAL run against an EMPTY production database: every migration file will execute in order and create the entire schema, including the migrations tracking table. This may take a while on shared hosting. Continue?"
+                />
             </MaintenanceLayout>
         );
+    }
+
+    // unreachable marker above kept minimal; real flow continues below
+    // eslint-disable-next-line
+    if (false) {
+        return null;
     }
 
     return (
@@ -154,7 +212,11 @@ export default function MaintenanceMigrations({
                 confirmText="Yes, run migrations"
                 onClose={() => !processing && setConfirming(false)}
                 onConfirm={run}
-                message={`This will run ${status.pending_count} pending migration(s) against the PRODUCTION database and may permanently change data. Ensure you have a backup. Continue?`}
+                message={
+                    status.available
+                        ? `This will run ${status.pending_count} pending migration(s) against the PRODUCTION database and may permanently change data. Ensure you have a backup. Continue?`
+                        : "This is the INITIAL run against an EMPTY production database: every migration file will execute in order and create the entire schema, including the migrations tracking table. This may take a while on shared hosting. Continue?"
+                }
             />
         </MaintenanceLayout>
     );
